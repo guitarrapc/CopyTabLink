@@ -1,6 +1,9 @@
 import { commandToFormat, type CopyFormat } from "../adapters/chrome/commands";
 import { writeTextToClipboard } from "../adapters/chrome/clipboard";
-import { readActiveTabPageInfo } from "../adapters/chrome/scripting";
+import {
+  readActiveTabPageInfo,
+  showCopyToast
+} from "../adapters/chrome/scripting";
 import { getActiveTabId } from "../adapters/chrome/tabs";
 import { formatMarkdown } from "../core/formatters/markdown";
 import { formatPlain } from "../core/formatters/plain";
@@ -42,20 +45,47 @@ async function runCopyFlow(
   format: CopyFormat,
   options: { dryRun?: boolean; pageInfo?: PageInfo } = {}
 ): Promise<string> {
+  let activeTabId: number | undefined;
   try {
-    const pageInfo = options.pageInfo ?? (await readPageInfoFromActiveTab());
+    const pageInfo = options.pageInfo ?? (await readPageInfoFromActiveTab((tabId) => {
+      activeTabId = tabId;
+    }));
     const text = format === "markdown" ? formatMarkdown(pageInfo) : formatPlain(pageInfo);
     if (!options.dryRun) {
       await writeTextToClipboard(text);
+      if (typeof activeTabId === "number") {
+        await showCopyToast(activeTabId, "Copied to clipboard", "success");
+      }
     }
     return text;
   } catch (error) {
     console.error(error);
+    if (!options.dryRun) {
+      const toastTabId = activeTabId ?? (await resolveActiveTabIdSilently());
+      if (typeof toastTabId === "number") {
+        try {
+          await showCopyToast(toastTabId, "Failed to copy", "error");
+        } catch {
+          // Ignore toast failure on restricted pages.
+        }
+      }
+    }
     throw error;
   }
 }
 
-async function readPageInfoFromActiveTab(): Promise<PageInfo> {
+async function readPageInfoFromActiveTab(
+  onResolvedTabId?: (tabId: number) => void
+): Promise<PageInfo> {
   const tabId = await getActiveTabId();
+  onResolvedTabId?.(tabId);
   return readActiveTabPageInfo(tabId);
+}
+
+async function resolveActiveTabIdSilently(): Promise<number | undefined> {
+  try {
+    return await getActiveTabId();
+  } catch {
+    return undefined;
+  }
 }
