@@ -1,3 +1,5 @@
+[![Build](https://github.com/guitarrapc/CopyTabLink/actions/workflows/build.yml/badge.svg)](https://github.com/guitarrapc/CopyTabLink/actions/workflows/build.yml)
+
 # CopyTabLink
 
 Chrome extension that copies the current page title and URL.
