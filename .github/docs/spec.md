@@ -52,8 +52,7 @@ The extension supports two copy formats:
 #### Plain text format
 
 ```text
-<title>
-<url>
+<title> <url>
 ```
 
 #### Markdown format
@@ -68,6 +67,7 @@ The extension supports copying via:
 
 - Toolbar icon click
 - Keyboard shortcuts
+- Context menu
 
 ## 6. Commands and Keyboard Shortcuts
 
@@ -75,10 +75,10 @@ The initial commands are:
 
 - `copy-plain`
   - Windows / Linux: `Alt+C`
-  - macOS: `Alt+C`
+  - macOS: `Command+Shift+C`
 - `copy-markdown`
-  - Windows / Linux: `Alt+Shift+C`
-  - macOS: `Alt+Shift+C`
+  - Windows / Linux: `Alt+M`
+  - macOS: `Command+Shift+M`
 
 Users can review and change assignments from:
 
@@ -99,7 +99,8 @@ The initial implementation uses:
     "scripting",
     "tabs",
     "offscreen",
-    "clipboardWrite"
+    "clipboardWrite",
+    "contextMenus"
   ]
 }
 ```
@@ -123,6 +124,10 @@ Required to create an offscreen document used for clipboard writes in MV3.
 ### 7.5 `clipboardWrite`
 
 Required for writing text to the clipboard.
+
+### 7.6 `contextMenus`
+
+Required to provide page context-menu entries for plain/markdown copy.
 
 ## 8. Host Permissions
 
@@ -163,7 +168,8 @@ Error behavior in v1:
 
 - Log with `console.error`
 - Do not crash extension runtime
-- No popup or toast notifications in initial scope
+- Show success toast (`Copied to clipboard`) when copy succeeds
+- Show error toast (`Failed to copy`) when copy fails (best effort on restricted pages)
 
 ## 11. Testing Strategy
 
@@ -182,10 +188,8 @@ E2E tests run with Playwright and load the unpacked extension in Chromium.
 
 Minimum E2E coverage:
 
-- `copy-plain` command copies expected plain output
-- `copy-markdown` command copies expected markdown output
-- Toolbar click path still triggers copy flow
-- Unsupported pages fail gracefully without fatal runtime breakage
+- Background trigger for plain format returns expected plain output
+- Background trigger for markdown format returns expected markdown output
 
 ## 12. CI Requirements
 
@@ -202,14 +206,24 @@ The branch is merge-ready only when all required checks pass.
 
 Release policy for v1:
 
-- Trigger packaging on release tag
+- Update package.json version and tag with `<version>` (e.g., `1.0.0`)
+- Create tag locally and verify tag/version consistency (`package.json` version must match tag without `v` prefix)
+- Trigger release workflow by `v*` tag push, or `workflow_dispatch` with tag input
 - Build extension bundle and create unsigned zip artifact in CI
-- Submit artifact to Chrome Web Store manually
-- Publish after store review approval
+- Generate and collect SLSA attestation (`*.sigstore.jsonl`) for the zip package
+- Create draft GitHub Release with zip and attestation as release assets
+- Submit artifact to Chrome Web Store manually and publish after review approval
 
 This keeps publishing auditable while removing manual packaging work.
 
-## 14. Manifest Evolution Policy
+## 14. Lessons Learned
+
+- `activeTab` + content-script execution can fail on restricted pages, so copy flow must degrade gracefully without breaking the extension runtime.
+- In MV3, clipboard write stability is improved by delegating writes to an offscreen document instead of writing directly from the service worker.
+- Usability improved by adding context-menu triggers in addition to action/shortcut paths, because keyboard shortcuts can conflict with OS or browser bindings.
+- Release safety improved by enforcing tag/version consistency before packaging, preventing accidental mismatches between published tag and extension metadata.
+
+## 15. Manifest Evolution Policy
 
 When Chrome changes MV requirements or APIs:
 
@@ -220,13 +234,14 @@ When Chrome changes MV requirements or APIs:
 
 Expected outcome: MV upgrades remain mostly adapter-focused, reducing broad rewrites.
 
-## 15. Initial Release Completion Criteria
+## 16. Initial Release Completion Criteria
 
 Initial implementation is complete when:
 
 - Toolbar click copies active page information
 - `Alt+C` copies plain text format
-- `Alt+Shift+C` copies markdown format
+- `Alt+M` copies markdown format
 - Commands are visible in `chrome://extensions/shortcuts`
+- Context menu entries can trigger copy
 - CI required checks pass (`lint`, `typecheck`, `unit`, `e2e`)
 - Unsupported pages do not cause fatal extension failure
