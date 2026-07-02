@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "CopyTabLink Copy",
   "short_name": "CopyTabLink",
-  "version": "0.1.0",
+  "version": "0.9.1",
   "description": "Copy the current page title and URL.",
   "permissions": [
     "activeTab",
