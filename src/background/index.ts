@@ -20,12 +20,12 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
       id: CONTEXT_MENU_COPY_PLAIN,
-      title: "Copy page as plain text",
+      title: "Copy Title & Link (plain)",
       contexts: ["page"]
     });
     chrome.contextMenus.create({
       id: CONTEXT_MENU_COPY_MARKDOWN,
-      title: "Copy page as markdown link",
+      title: "Copy Title & Link (markdown)",
       contexts: ["page"]
     });
   });
@@ -57,7 +57,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   const requestedFormat = message.format === "markdown" ? "markdown" : "plain";
   const requestedPageInfo =
     typeof message.pageInfo?.title === "string" &&
-    typeof message.pageInfo?.url === "string"
+      typeof message.pageInfo?.url === "string"
       ? normalizePageInfo(message.pageInfo as PageInfo)
       : undefined;
 
