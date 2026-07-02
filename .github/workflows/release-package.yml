@@ -4,9 +4,74 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v1.2.3 or 1.2.3)"
+        required: true
+        type: string
 
 jobs:
+  verify:
+    name: Verify tag and version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Resolve tag ref
+        id: ref
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            RAW="${TAG}"
+            TAG="v${RAW#v}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+        env:
+          TAG: ${{ inputs.tag }}
+
+      - name: Verify tag on remote (workflow_dispatch)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh api "repos/${{ github.repository }}/git/ref/tags/${{ steps.ref.outputs.tag }}" --silent --fail \
+            || { echo "::error::Tag '${{ steps.ref.outputs.tag }}' does not exist on the remote. Push it first, then re-run."; exit 1; }
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          ref: ${{ steps.ref.outputs.tag }}
+
+      - name: Verify version ↔ tag consistency
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.ref.outputs.tag }}"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          TAG_VERSION="${TAG#v}"
+          if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Version mismatch: package.json has '$PACKAGE_VERSION' but tag is '$TAG' (expected '$TAG_VERSION')"
+            exit 1
+          fi
+          echo "version=${PACKAGE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "### Version check passed" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Tag:** \`${TAG}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Version:** \`${PACKAGE_VERSION}\`" >> "$GITHUB_STEP_SUMMARY"
+
   package:
+    needs: [verify]
     permissions:
       contents: read
     runs-on: ubuntu-24.04
@@ -15,6 +80,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
+          ref: ${{ needs.verify.outputs.tag }}
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24
@@ -76,7 +142,7 @@ jobs:
 
   create-release:
     if: ${{ github.event_name == 'push' }}
-    needs: [package, attest]
+    needs: [attest]
     permissions:
       contents: write
     runs-on: ubuntu-24.04
@@ -107,4 +173,4 @@ jobs:
           gh release create "$TAG" release/* --repo "$GITHUB_REPOSITORY" --title "$TAG" --generate-notes --verify-tag --draft
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ needs.verify.outputs.tag }}
