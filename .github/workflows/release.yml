@@ -142,7 +142,7 @@ jobs:
 
   create-release:
     if: ${{ github.event_name == 'push' }}
-    needs: [attest]
+    needs: [verify, attest]
     permissions:
       contents: write
     runs-on: ubuntu-24.04
