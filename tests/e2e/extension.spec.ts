@@ -34,7 +34,7 @@ test.describe("copy flow", () => {
         });
       });
       expect(result.ok).toBe(true);
-      expect(result.text).toBe("Playwright Tab\nhttps://example.com/plain");
+      expect(result.text).toBe("Playwright Tab https://example.com/plain");
     } finally {
       await context.close();
     }

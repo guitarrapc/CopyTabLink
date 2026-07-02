@@ -4,12 +4,12 @@ import { formatPlain } from "../../src/core/formatters/plain";
 import { normalizePageInfo } from "../../src/core/pageInfo";
 
 describe("formatters", () => {
-  it("formats plain text as two lines", () => {
+  it("formats plain text with space separator", () => {
     const text = formatPlain({
       title: "Example title",
       url: "https://example.com/path"
     });
-    expect(text).toBe("Example title\nhttps://example.com/path");
+    expect(text).toBe("Example title https://example.com/path");
   });
 
   it("formats markdown link", () => {
