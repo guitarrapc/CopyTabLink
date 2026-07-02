@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  test:
+  build:
     permissions:
       contents: read
     runs-on: ubuntu-24.04
