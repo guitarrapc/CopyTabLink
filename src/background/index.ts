@@ -9,8 +9,36 @@ import { formatMarkdown } from "../core/formatters/markdown";
 import { formatPlain } from "../core/formatters/plain";
 import { normalizePageInfo, type PageInfo } from "../core/pageInfo";
 
+const CONTEXT_MENU_COPY_PLAIN = "context-copy-plain";
+const CONTEXT_MENU_COPY_MARKDOWN = "context-copy-markdown";
+
 chrome.action.onClicked.addListener(async () => {
   await runCopyFlow("plain");
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: CONTEXT_MENU_COPY_PLAIN,
+      title: "Copy page as plain text",
+      contexts: ["page"]
+    });
+    chrome.contextMenus.create({
+      id: CONTEXT_MENU_COPY_MARKDOWN,
+      title: "Copy page as markdown link",
+      contexts: ["page"]
+    });
+  });
+});
+
+chrome.contextMenus.onClicked.addListener(async (info) => {
+  if (info.menuItemId === CONTEXT_MENU_COPY_PLAIN) {
+    await runCopyFlow("plain");
+    return;
+  }
+  if (info.menuItemId === CONTEXT_MENU_COPY_MARKDOWN) {
+    await runCopyFlow("markdown");
+  }
 });
 
 chrome.commands.onCommand.addListener(async (command) => {

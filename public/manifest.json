@@ -4,7 +4,14 @@
   "short_name": "CopyTabLink",
   "version": "0.1.0",
   "description": "Copy the current page title and URL.",
-  "permissions": ["activeTab", "scripting", "tabs", "offscreen", "clipboardWrite"],
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "tabs",
+    "offscreen",
+    "clipboardWrite",
+    "contextMenus"
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
