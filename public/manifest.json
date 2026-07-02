@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "CopyTabLink Copy",
+  "short_name": "CopyTabLink",
+  "version": "0.1.0",
+  "description": "Copy the current page title and URL.",
+  "permissions": ["activeTab", "scripting", "tabs", "offscreen", "clipboardWrite"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "commands": {
+    "copy-plain": {
+      "suggested_key": {
+        "default": "Alt+C",
+        "mac": "Alt+C"
+      },
+      "description": "Copy current page as plain text"
+    },
+    "copy-markdown": {
+      "suggested_key": {
+        "default": "Alt+Shift+C",
+        "mac": "Alt+Shift+C"
+      },
+      "description": "Copy current page as markdown link"
+    }
+  },
+  "action": {
+    "default_title": "Copy Page Info"
+  }
+}

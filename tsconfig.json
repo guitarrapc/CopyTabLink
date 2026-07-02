@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["chrome", "node"],
+    "strict": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "isolatedModules": true
+  },
+  "include": ["src", "tests", "vite.config.ts", "playwright.config.ts", "eslint.config.js"]
+}
