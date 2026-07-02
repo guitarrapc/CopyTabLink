@@ -13,14 +13,14 @@
     "copy-plain": {
       "suggested_key": {
         "default": "Alt+C",
-        "mac": "Alt+C"
+        "mac": "Command+Shift+C"
       },
       "description": "Copy current page as plain text"
     },
     "copy-markdown": {
       "suggested_key": {
-        "default": "Alt+Shift+C",
-        "mac": "Alt+Shift+C"
+        "default": "Alt+M",
+        "mac": "Command+Shift+M"
       },
       "description": "Copy current page as markdown link"
     }

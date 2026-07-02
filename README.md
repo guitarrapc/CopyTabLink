@@ -14,7 +14,9 @@ Load `dist/` from `chrome://extensions/` with Developer Mode enabled.
 ## Commands
 
 - `Alt+C`: copy plain format
-- `Alt+Shift+C`: copy markdown format
+- `Alt+M`: copy markdown format (Windows/Linux default)
+- `Command+Shift+C`: copy plain format (macOS default)
+- `Command+Shift+M`: copy markdown format (macOS default)
 
 ## Scripts
 
