@@ -58,12 +58,8 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${{ steps.ref.outputs.tag }}"
-          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
-          TAG_VERSION="${TAG#v}"
-          if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
-            echo "::error::Version mismatch: package.json has '$PACKAGE_VERSION' but tag is '$TAG' (expected '$TAG_VERSION')"
-            exit 1
-          fi
+          npm run verify:release-version -- "$TAG"
+          PACKAGE_VERSION="$(node -p "JSON.parse(require('node:fs').readFileSync('./package.json', 'utf8')).version")"
           echo "version=${PACKAGE_VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "### Version check passed" >> "$GITHUB_STEP_SUMMARY"

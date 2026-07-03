@@ -8,6 +8,8 @@
     "build": "vite build",
     "clean": "rimraf dist",
     "resize:logo": "node scripts/resize-logo.mjs",
+    "bump:version": "node scripts/bump-version.mjs",
+    "verify:release-version": "node scripts/verify-release-version.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "npm run test:unit && npm run test:e2e",
