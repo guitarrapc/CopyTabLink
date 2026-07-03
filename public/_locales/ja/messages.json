@@ -1,0 +1,29 @@
+{
+  "extName": {
+    "message": "CopyTabLink Copy"
+  },
+  "extDescription": {
+    "message": "現在のページのタイトルとURLをコピーします。"
+  },
+  "actionDefaultTitle": {
+    "message": "タイトルとリンクをコピー"
+  },
+  "commandCopyPlain": {
+    "message": "タイトルとリンクをコピー（プレーン）"
+  },
+  "commandCopyMarkdown": {
+    "message": "タイトルとリンクをコピー（Markdown）"
+  },
+  "contextCopyPlain": {
+    "message": "タイトルとリンクをコピー（プレーン）"
+  },
+  "contextCopyMarkdown": {
+    "message": "タイトルとリンクをコピー（Markdown）"
+  },
+  "toastCopySuccess": {
+    "message": "クリップボードにコピーしました"
+  },
+  "toastCopyFailed": {
+    "message": "コピーに失敗しました"
+  }
+}

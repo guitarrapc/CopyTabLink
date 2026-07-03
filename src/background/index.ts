@@ -17,18 +17,7 @@ chrome.action.onClicked.addListener(async () => {
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.removeAll(() => {
-    chrome.contextMenus.create({
-      id: CONTEXT_MENU_COPY_PLAIN,
-      title: "Copy Title & Link (plain)",
-      contexts: ["page"]
-    });
-    chrome.contextMenus.create({
-      id: CONTEXT_MENU_COPY_MARKDOWN,
-      title: "Copy Title & Link (markdown)",
-      contexts: ["page"]
-    });
-  });
+  void recreateContextMenus();
 });
 
 chrome.contextMenus.onClicked.addListener(async (info) => {
@@ -62,7 +51,15 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       : undefined;
 
   runCopyFlow(requestedFormat, { dryRun: true, pageInfo: requestedPageInfo })
-    .then((text) => sendResponse({ ok: true, text }))
+    .then(({ text }) =>
+      sendResponse({
+        ok: true,
+        text,
+        locale: chrome.i18n.getUILanguage(),
+        successMessage: getMessage("toastCopySuccess", "Copied to clipboard"),
+        errorMessage: getMessage("toastCopyFailed", "Failed to copy")
+      })
+    )
     .catch((error: unknown) =>
       sendResponse({ ok: false, error: String(error) })
     );
@@ -72,7 +69,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 async function runCopyFlow(
   format: CopyFormat,
   options: { dryRun?: boolean; pageInfo?: PageInfo } = {}
-): Promise<string> {
+): Promise<{ text: string }> {
   let activeTabId: number | undefined;
   try {
     const pageInfo = options.pageInfo ?? (await readPageInfoFromActiveTab((tabId) => {
@@ -82,17 +79,25 @@ async function runCopyFlow(
     if (!options.dryRun) {
       await writeTextToClipboard(text);
       if (typeof activeTabId === "number") {
-        await showCopyToast(activeTabId, "Copied to clipboard", "success");
+        await showCopyToast(
+          activeTabId,
+          getMessage("toastCopySuccess", "Copied to clipboard"),
+          "success"
+        );
       }
     }
-    return text;
+    return { text };
   } catch (error) {
     console.error(error);
     if (!options.dryRun) {
       const toastTabId = activeTabId ?? (await resolveActiveTabIdSilently());
       if (typeof toastTabId === "number") {
         try {
-          await showCopyToast(toastTabId, "Failed to copy", "error");
+          await showCopyToast(
+            toastTabId,
+            getMessage("toastCopyFailed", "Failed to copy"),
+            "error"
+          );
         } catch {
           // Ignore toast failure on restricted pages.
         }
@@ -116,4 +121,22 @@ async function resolveActiveTabIdSilently(): Promise<number | undefined> {
   } catch {
     return undefined;
   }
+}
+
+async function recreateContextMenus(): Promise<void> {
+  await chrome.contextMenus.removeAll();
+  chrome.contextMenus.create({
+    id: CONTEXT_MENU_COPY_PLAIN,
+    title: getMessage("contextCopyPlain", "Copy Title & Link (plain)"),
+    contexts: ["page"]
+  });
+  chrome.contextMenus.create({
+    id: CONTEXT_MENU_COPY_MARKDOWN,
+    title: getMessage("contextCopyMarkdown", "Copy Title & Link (markdown)"),
+    contexts: ["page"]
+  });
+}
+
+function getMessage(key: string, fallback: string): string {
+  return chrome.i18n.getMessage(key) || fallback;
 }
