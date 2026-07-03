@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "CopyTabLink Copy",
+  "default_locale": "en",
+  "name": "__MSG_extName__",
   "short_name": "CopyTabLink",
   "version": "0.9.1",
-  "description": "Copy the current page title and URL.",
+  "description": "__MSG_extDescription__",
   "permissions": [
     "activeTab",
     "scripting",
@@ -22,17 +23,17 @@
         "default": "Alt+C",
         "mac": "Command+Shift+C"
       },
-      "description": "Copy current page as plain text"
+      "description": "__MSG_commandCopyPlain__"
     },
     "copy-markdown": {
       "suggested_key": {
         "default": "Alt+M",
         "mac": "Command+Shift+M"
       },
-      "description": "Copy current page as markdown link"
+      "description": "__MSG_commandCopyMarkdown__"
     }
   },
   "action": {
-    "default_title": "Copy Page Info"
+    "default_title": "__MSG_actionDefaultTitle__"
   }
 }

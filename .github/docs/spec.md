@@ -12,6 +12,8 @@ The extension is optimized for quick referencing while writing blog posts, techn
 - Short name: `CopyTabLink`
 - Description: `Copy the current page title and URL.`
 
+User-facing strings are localization resources managed through Chrome extension i18n.
+
 ## 3. Target Browsers
 
 The initial implementation targets the following browsers:
@@ -68,6 +70,26 @@ The extension supports copying via:
 - Toolbar icon click
 - Keyboard shortcuts
 - Context menu
+
+### 5.5 Localization (i18n)
+
+The extension uses Chrome's built-in i18n system.
+
+- Localization resources are defined in `/_locales/<locale>/messages.json`.
+- `manifest.json` declares `"default_locale": "en"`.
+- Manifest fields use `__MSG_<key>__` placeholders.
+- Runtime strings are resolved via `chrome.i18n.getMessage()`.
+
+Initial locale coverage:
+
+- `en` (default)
+- `ja`
+
+Scope of localized strings:
+
+- Extension metadata shown by Chrome (name/description/action title/command descriptions)
+- Context menu labels
+- In-page copy success/failure toast messages
 
 ## 6. Commands and Keyboard Shortcuts
 
@@ -168,8 +190,8 @@ Error behavior in v1:
 
 - Log with `console.error`
 - Do not crash extension runtime
-- Show success toast (`Copied to clipboard`) when copy succeeds
-- Show error toast (`Failed to copy`) when copy fails (best effort on restricted pages)
+- Show localized success toast when copy succeeds
+- Show localized error toast when copy fails (best effort on restricted pages)
 
 ## 11. Testing Strategy
 
@@ -181,6 +203,7 @@ Unit tests target core logic:
 - Markdown formatter output
 - URL normalization behavior
 - Title/site deduplication logic (if enabled by core rules)
+- Locale resource consistency (locale key alignment between `en` and `ja`)
 
 ### 11.2 E2E Tests
 
@@ -190,6 +213,7 @@ Minimum E2E coverage:
 
 - Background trigger for plain format returns expected plain output
 - Background trigger for markdown format returns expected markdown output
+- Background trigger returns localized UI strings for the active browser locale
 
 ## 12. CI Requirements
 
@@ -222,6 +246,7 @@ This keeps publishing auditable while removing manual packaging work.
 - In MV3, clipboard write stability is improved by delegating writes to an offscreen document instead of writing directly from the service worker.
 - Usability improved by adding context-menu triggers in addition to action/shortcut paths, because keyboard shortcuts can conflict with OS or browser bindings.
 - Release safety improved by enforcing tag/version consistency before packaging, preventing accidental mismatches between published tag and extension metadata.
+- For Chrome extensions, localization should use `/_locales` + `chrome.i18n` as the source of truth; custom locale state in extension storage is unnecessary for baseline multilingual support.
 
 ## 15. Manifest Evolution Policy
 
