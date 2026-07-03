@@ -1,0 +1,29 @@
+{
+  "extName": {
+    "message": "CopyTabLink Copy"
+  },
+  "extDescription": {
+    "message": "Copia el título y la URL de la página actual."
+  },
+  "actionDefaultTitle": {
+    "message": "Copiar título y enlace"
+  },
+  "commandCopyPlain": {
+    "message": "Copiar título y enlace (texto plano)"
+  },
+  "commandCopyMarkdown": {
+    "message": "Copiar título y enlace (Markdown)"
+  },
+  "contextCopyPlain": {
+    "message": "Copiar título y enlace (texto plano)"
+  },
+  "contextCopyMarkdown": {
+    "message": "Copiar título y enlace (Markdown)"
+  },
+  "toastCopySuccess": {
+    "message": "Copiado al portapapeles"
+  },
+  "toastCopyFailed": {
+    "message": "No se pudo copiar"
+  }
+}

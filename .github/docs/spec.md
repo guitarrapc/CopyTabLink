@@ -84,6 +84,8 @@ Initial locale coverage:
 
 - `en` (default)
 - `ja`
+- `es`
+- `fr`
 
 Scope of localized strings:
 
@@ -203,7 +205,7 @@ Unit tests target core logic:
 - Markdown formatter output
 - URL normalization behavior
 - Title/site deduplication logic (if enabled by core rules)
-- Locale resource consistency (locale key alignment between `en` and `ja`)
+- Locale resource consistency (locale key alignment across all supported locales)
 
 ### 11.2 E2E Tests
 
