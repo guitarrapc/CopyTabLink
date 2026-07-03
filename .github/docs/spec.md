@@ -1,14 +1,14 @@
-# CopyTabLink Copy Specification
+# CopyTabLink Specification
 
 ## 1. Overview
 
-**CopyTabLink Copy** is a Chrome extension that copies information about the currently active page to the clipboard.
+**CopyTabLink** is a Chrome extension that copies information about the currently active page to the clipboard.
 
 The extension is optimized for quick referencing while writing blog posts, technical notes, issues, pull requests, chat messages, and documentation.
 
 ## 2. Extension Name
 
-- Official name: `CopyTabLink Copy`
+- Official name: `CopyTabLink`
 - Short name: `CopyTabLink`
 - Description: `Copy the current page title and URL.`
 
