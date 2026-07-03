@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "CopyTabLink Copy"
+    "message": "CopyTabLink"
   },
   "extDescription": {
     "message": "Copy the current page title and URL."
