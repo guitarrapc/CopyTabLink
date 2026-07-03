@@ -1,0 +1,29 @@
+{
+  "extName": {
+    "message": "CopyTabLink Copy"
+  },
+  "extDescription": {
+    "message": "複製目前頁面的標題和 URL。"
+  },
+  "actionDefaultTitle": {
+    "message": "複製標題與連結"
+  },
+  "commandCopyPlain": {
+    "message": "複製標題與連結（純文字）"
+  },
+  "commandCopyMarkdown": {
+    "message": "複製標題與連結（Markdown）"
+  },
+  "contextCopyPlain": {
+    "message": "複製標題與連結（純文字）"
+  },
+  "contextCopyMarkdown": {
+    "message": "複製標題與連結（Markdown）"
+  },
+  "toastCopySuccess": {
+    "message": "已複製到剪貼簿"
+  },
+  "toastCopyFailed": {
+    "message": "複製失敗"
+  }
+}

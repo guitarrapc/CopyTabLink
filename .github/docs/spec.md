@@ -86,6 +86,8 @@ Initial locale coverage:
 - `ja`
 - `es`
 - `fr`
+- `zh_CN`
+- `zh_TW`
 
 Scope of localized strings:
 
