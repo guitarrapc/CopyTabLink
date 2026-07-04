@@ -12,7 +12,7 @@ jobs:
   build:
     strategy:
       matrix:
-        runs-on: [ubuntu-24.04, macos-14, windows-2022]
+        runs-on: [ubuntu-24.04, macos-26, windows-2025]
     permissions:
       contents: read
     runs-on: ${{ matrix.runs-on }}
