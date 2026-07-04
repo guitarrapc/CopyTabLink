@@ -5,6 +5,21 @@ import { join, resolve } from "node:path";
 
 const extensionPath = resolve("dist");
 
+async function getExtensionId(context: BrowserContext): Promise<string> {
+  const serviceWorker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
+  return new URL(serviceWorker.url()).host;
+}
+
+async function openExtensionPage(context: BrowserContext): Promise<{
+  extensionId: string;
+  extensionPage: Awaited<ReturnType<BrowserContext["newPage"]>>;
+}> {
+  const extensionId = await getExtensionId(context);
+  const extensionPage = await context.newPage();
+  await extensionPage.goto(`chrome-extension://${extensionId}/offscreen.html`);
+  return { extensionId, extensionPage };
+}
+
 async function launchExtensionContext(locale?: "en" | "ja"): Promise<BrowserContext> {
   const userDataDir = mkdtempSync(join(tmpdir(), "copytablink-e2e-"));
   const lang = locale ?? "en";
@@ -23,10 +38,7 @@ test.describe("copy flow", () => {
   test("copies plain format via background trigger", async () => {
     const context = await launchExtensionContext();
     try {
-      const serviceWorker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
-      const extensionId = new URL(serviceWorker.url()).host;
-      const extensionPage = await context.newPage();
-      await extensionPage.goto(`chrome-extension://${extensionId}/offscreen.html`);
+      const { extensionPage } = await openExtensionPage(context);
 
       const result = await extensionPage.evaluate(async () => {
         return chrome.runtime.sendMessage({
@@ -45,10 +57,7 @@ test.describe("copy flow", () => {
   test("copies markdown format via background trigger", async () => {
     const context = await launchExtensionContext();
     try {
-      const serviceWorker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
-      const extensionId = new URL(serviceWorker.url()).host;
-      const extensionPage = await context.newPage();
-      await extensionPage.goto(`chrome-extension://${extensionId}/offscreen.html`);
+      const { extensionPage } = await openExtensionPage(context);
 
       const result = await extensionPage.evaluate(async () => {
         return chrome.runtime.sendMessage({
@@ -67,10 +76,7 @@ test.describe("copy flow", () => {
   test("returns localized messages for current browser locale", async () => {
     const context = await launchExtensionContext("en");
     try {
-      const serviceWorker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
-      const extensionId = new URL(serviceWorker.url()).host;
-      const extensionPage = await context.newPage();
-      await extensionPage.goto(`chrome-extension://${extensionId}/offscreen.html`);
+      const { extensionPage } = await openExtensionPage(context);
 
       const result = await extensionPage.evaluate(async () => {
         return chrome.runtime.sendMessage({
@@ -83,6 +89,68 @@ test.describe("copy flow", () => {
       expect(result.locale.toLowerCase()).toContain("en");
       expect(result.successMessage).toBe("Copied to clipboard");
       expect(result.errorMessage).toBe("Failed to copy");
+    } finally {
+      await context.close();
+    }
+  });
+});
+
+test.describe("keyboard shortcuts", () => {
+  test("registers Alt+C and Alt+M without Chrome DevTools conflicts", async () => {
+    const context = await launchExtensionContext();
+    try {
+      const { extensionPage } = await openExtensionPage(context);
+
+      const commands = await extensionPage.evaluate(async () => chrome.commands.getAll());
+      const plain = commands.find((command) => command.name === "copy-plain");
+      const markdown = commands.find((command) => command.name === "copy-markdown");
+
+      expect(plain?.shortcut).toBe("Alt+C");
+      expect(markdown?.shortcut).toBe("Alt+M");
+      expect(plain?.shortcut).not.toMatch(/^Command\+Shift\+/);
+      expect(markdown?.shortcut).not.toMatch(/^Command\+Shift\+/);
+    } finally {
+      await context.close();
+    }
+  });
+
+  test("executes copy-plain through the command handler", async () => {
+    const context = await launchExtensionContext();
+    try {
+      const { extensionPage } = await openExtensionPage(context);
+
+      const result = await extensionPage.evaluate(async () =>
+        chrome.runtime.sendMessage({
+          type: "__e2e_trigger_command__",
+          command: "copy-plain",
+          pageInfo: { title: "Shortcut Tab", url: "https://example.com/plain-shortcut" }
+        })
+      );
+
+      expect(result.ok).toBe(true);
+      expect(result.command).toBe("copy-plain");
+      expect(result.text).toBe("Shortcut Tab https://example.com/plain-shortcut");
+    } finally {
+      await context.close();
+    }
+  });
+
+  test("executes copy-markdown through the command handler", async () => {
+    const context = await launchExtensionContext();
+    try {
+      const { extensionPage } = await openExtensionPage(context);
+
+      const result = await extensionPage.evaluate(async () =>
+        chrome.runtime.sendMessage({
+          type: "__e2e_trigger_command__",
+          command: "copy-markdown",
+          pageInfo: { title: "Shortcut Tab", url: "https://example.com/markdown-shortcut" }
+        })
+      );
+
+      expect(result.ok).toBe(true);
+      expect(result.command).toBe("copy-markdown");
+      expect(result.text).toBe("[Shortcut Tab](https://example.com/markdown-shortcut)");
     } finally {
       await context.close();
     }

@@ -39,6 +39,25 @@ chrome.commands.onCommand.addListener(async (command) => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type === "__e2e_trigger_command__") {
+    const format = commandToFormat(String(message.command ?? ""));
+    if (!format) {
+      sendResponse({ ok: false, error: `Unknown command: ${String(message.command ?? "")}` });
+      return;
+    }
+
+    const requestedPageInfo =
+      typeof message.pageInfo?.title === "string" &&
+        typeof message.pageInfo?.url === "string"
+        ? normalizePageInfo(message.pageInfo as PageInfo)
+        : undefined;
+
+    runCopyFlow(format, { dryRun: true, pageInfo: requestedPageInfo })
+      .then(({ text }) => sendResponse({ ok: true, text, command: message.command }))
+      .catch((error: unknown) => sendResponse({ ok: false, error: String(error) }));
+    return true;
+  }
+
   if (message?.type !== "__e2e_trigger_copy__") {
     return;
   }
