@@ -14,8 +14,8 @@ Load `dist/` from `chrome://extensions/` with Developer Mode enabled.
 
 | WHAT | Windows/Linux | macOS |
 | --- | --- | --- |
-| Copy plain format | `Alt+C` | `Command+Shift+C` |
-| Copy markdown format | `Alt+M` | `Command+Shift+M` |
+| Copy plain format | `Alt+C` | `Option+C` |
+| Copy markdown format | `Alt+M` | `Option+M` |
 
 ## Development
 

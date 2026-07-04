@@ -20,15 +20,13 @@
   "commands": {
     "copy-plain": {
       "suggested_key": {
-        "default": "Alt+C",
-        "mac": "Command+Shift+C"
+        "default": "Alt+C"
       },
       "description": "__MSG_commandCopyPlain__"
     },
     "copy-markdown": {
       "suggested_key": {
-        "default": "Alt+M",
-        "mac": "Command+Shift+M"
+        "default": "Alt+M"
       },
       "description": "__MSG_commandCopyMarkdown__"
     }
