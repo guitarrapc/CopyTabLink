@@ -2,8 +2,20 @@ import { test, expect, chromium, type BrowserContext } from "@playwright/test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import {
+  isAltShortcut,
+  isChromeDevToolsConflict
+} from "../helpers/keyboard-shortcuts";
 
 const extensionPath = resolve("dist");
+
+function expectAltShortcut(shortcut: string | undefined, key: "C" | "M"): void {
+  expect(isAltShortcut(shortcut, key)).toBe(true);
+}
+
+function expectNotChromeDevToolsConflict(shortcut: string | undefined): void {
+  expect(isChromeDevToolsConflict(shortcut)).toBe(false);
+}
 
 async function getExtensionId(context: BrowserContext): Promise<string> {
   const serviceWorker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
@@ -105,10 +117,10 @@ test.describe("keyboard shortcuts", () => {
       const plain = commands.find((command) => command.name === "copy-plain");
       const markdown = commands.find((command) => command.name === "copy-markdown");
 
-      expect(plain?.shortcut).toBe("Alt+C");
-      expect(markdown?.shortcut).toBe("Alt+M");
-      expect(plain?.shortcut).not.toMatch(/^Command\+Shift\+/);
-      expect(markdown?.shortcut).not.toMatch(/^Command\+Shift\+/);
+      expectAltShortcut(plain?.shortcut, "C");
+      expectAltShortcut(markdown?.shortcut, "M");
+      expectNotChromeDevToolsConflict(plain?.shortcut);
+      expectNotChromeDevToolsConflict(markdown?.shortcut);
     } finally {
       await context.close();
     }
