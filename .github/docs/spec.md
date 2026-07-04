@@ -100,11 +100,9 @@ Scope of localized strings:
 The initial commands are:
 
 - `copy-plain`
-  - Windows / Linux: `Alt+C`
-  - macOS: `Command+Shift+C`
+  - All platforms: `Alt+C` (macOS: `Option` key)
 - `copy-markdown`
-  - Windows / Linux: `Alt+M`
-  - macOS: `Command+Shift+M`
+  - All platforms: `Alt+M` (macOS: `Option` key)
 
 Users can review and change assignments from:
 
