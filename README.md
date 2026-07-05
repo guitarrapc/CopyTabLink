@@ -10,6 +10,12 @@ You can copy by Shortcut or context menu. Toaast notification will be shown afte
 
 Load `dist/` from `chrome://extensions/` with Developer Mode enabled.
 
+## Install
+
+You can install extensions from [Chrome Web Store](https://chromewebstore.google.com/detail/ihkanabidjfdhmcpbfnhklihnmompkpc?utm_source=item-share-cb).
+
+If you are developer, you can download .zip and install as developer mode.
+
 ## Commands
 
 | WHAT | Windows/Linux | macOS |
