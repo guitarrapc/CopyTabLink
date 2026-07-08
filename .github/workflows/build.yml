@@ -45,6 +45,7 @@ jobs:
     needs: build
     permissions: {}
     runs-on: ubuntu-24.04
+    timeout-minutes: 1
     steps:
       - name: Build complete
         run: echo "Build complete"
